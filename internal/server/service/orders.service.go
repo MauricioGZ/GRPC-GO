@@ -6,29 +6,20 @@ import (
 	"time"
 
 	pb "github.com/MauricioGZ/GRPC-GO/internal/gen"
+	"github.com/MauricioGZ/GRPC-GO/internal/server/repository"
 )
 
 type server struct {
+	repo repository.Repository
 	pb.UnimplementedOrdersServiceServer
 }
 
-// faking a db
 var orders []*pb.Order
-var products []*pb.Product = []*pb.Product{
-	{
-		ProductID:   1,
-		Price:       9.99,
-		Description: "Hamburguesa con papas",
-	},
-	{
-		ProductID:   2,
-		Price:       2.99,
-		Description: "Malteada",
-	},
-}
 
-func New() *server {
-	return &server{}
+func New(_repo repository.Repository) *server {
+	return &server{
+		repo: _repo,
+	}
 }
 
 func (s *server) CreateOrder(ctx context.Context, req *pb.CreateOrderRequest) (*pb.CreateOrderResponse, error) {
@@ -53,14 +44,22 @@ func generateID() uint32 {
 }
 
 func (s *server) GetMenu(req *pb.GetMenuRequest, stream pb.OrdersService_GetMenuServer) error {
+
+	products, err := s.repo.GetAllProducts(context.Background())
+	if err != nil {
+		return err
+	}
 	for _, p := range products {
 		res := &pb.GetMenuResponse{
-			Product: p,
+			Product: &pb.Product{
+				ProductID: p.ID,
+				Name:      p.Name,
+				Price:     p.Price,
+			},
 		}
 		if err := stream.Send(res); err != nil {
 			return err
 		}
-		time.Sleep(2 * time.Second)
 	}
 	return nil
 }
