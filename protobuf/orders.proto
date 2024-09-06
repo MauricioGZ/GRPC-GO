@@ -1,0 +1,39 @@
+syntax = "proto3";
+
+option go_package = "github.com/MauricioGZ/GRPC-GO/proto";
+
+package orders_service;
+
+service OrdersService {
+  rpc GetMenu(GetMenuRequest) returns (stream GetMenuResponse);
+  rpc CreateOrder(CreateOrderRequest) returns (CreateOrderResponse);
+}
+
+message Product {
+  uint32 productID = 1;
+  float price = 2;
+  string description = 3;
+}
+
+message Order {
+  uint32 orderID = 1;
+  uint32 customerID = 2;
+  uint32 productID = 3;
+  uint32 quantity = 4;
+}
+
+message GetMenuRequest {}
+
+message GetMenuResponse {
+  Product product = 1;
+}
+
+message CreateOrderRequest {
+  uint32 customerID = 1;
+  uint32 productID = 2;
+  uint32 quantity = 3;
+}
+
+message CreateOrderResponse {
+  repeated Order orders = 1 ;
+}
