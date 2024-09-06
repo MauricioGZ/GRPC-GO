@@ -1,11 +1,9 @@
 package main
 
 import (
-	"context"
-	"fmt"
-	"io"
 	"log"
 
+	"github.com/MauricioGZ/GRPC-GO/internal/client/api"
 	pb "github.com/MauricioGZ/GRPC-GO/internal/gen"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
@@ -25,26 +23,11 @@ func main() {
 	defer conn.Close()
 
 	client := pb.NewOrdersServiceClient(conn)
-	menu, err := client.GetMenu(context.Background(), &pb.GetMenuRequest{})
 
+	a := api.New(client)
+
+	err = a.Run()
 	if err != nil {
 		log.Fatal(err)
 	}
-
-	done := make(chan bool)
-
-	go func() {
-		for {
-			res, err := menu.Recv()
-			if err != nil {
-				if err == io.EOF {
-					done <- true
-					return
-				}
-				log.Fatal(err)
-			}
-			fmt.Println(res.Product)
-		}
-	}()
-	<-done
 }

@@ -5,7 +5,10 @@ import (
 	"net"
 
 	pb "github.com/MauricioGZ/GRPC-GO/internal/gen"
+	"github.com/MauricioGZ/GRPC-GO/internal/server/db"
+	"github.com/MauricioGZ/GRPC-GO/internal/server/repository"
 	serverService "github.com/MauricioGZ/GRPC-GO/internal/server/service"
+	"github.com/MauricioGZ/GRPC-GO/settings"
 	"google.golang.org/grpc"
 )
 
@@ -14,6 +17,19 @@ const (
 )
 
 func main() {
+	s, err := settings.New()
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	db, err := db.New(*s)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer db.Close()
+
+	r := repository.New(db)
+
 	lis, err := net.Listen("tcp", port)
 
 	if err != nil {
@@ -21,7 +37,7 @@ func main() {
 	}
 
 	grpcServer := grpc.NewServer()
-	pb.RegisterOrdersServiceServer(grpcServer, serverService.New())
+	pb.RegisterOrdersServiceServer(grpcServer, serverService.New(r))
 	if err := grpcServer.Serve(lis); err != nil {
 		log.Fatalf("Failed to start: %s", err.Error())
 	}
