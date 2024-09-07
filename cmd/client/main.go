@@ -4,6 +4,7 @@ import (
 	"log"
 
 	"github.com/MauricioGZ/GRPC-GO/internal/client/api"
+	"github.com/MauricioGZ/GRPC-GO/internal/client/service"
 	pb "github.com/MauricioGZ/GRPC-GO/internal/gen"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
@@ -24,7 +25,8 @@ func main() {
 
 	client := pb.NewOrdersServiceClient(conn)
 
-	a := api.New(client)
+	s := service.New(client)
+	a := api.New(s)
 
 	err = a.Run()
 	if err != nil {

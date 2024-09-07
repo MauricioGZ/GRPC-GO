@@ -8,12 +8,36 @@ import (
 )
 
 const (
+	qryGetProductPriceByID = `select
+															price
+														from PRODUCTS
+														where id = ?;`
 	qryGetAllProducts = `	select
 													id,
 													name,
 													price
 												from PRODUCTS;`
 )
+
+func (r *repo) GetProductPriceByID(ctx context.Context, producID uint32) (*float32, error) {
+	var price float32
+	err := r.db.QueryRowContext(
+		ctx,
+		qryGetProductPriceByID,
+		producID,
+	).Scan(
+		&price,
+	)
+
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return nil, nil
+		}
+		return nil, err
+	}
+
+	return &price, nil
+}
 
 func (r *repo) GetAllProducts(ctx context.Context) ([]entity.Product, error) {
 	var product entity.Product

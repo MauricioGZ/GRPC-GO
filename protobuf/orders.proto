@@ -10,30 +10,31 @@ service OrdersService {
 }
 
 message Product {
-  uint32 productID = 1;
-  string name = 2;
-  float price = 3;
+  uint32 productID = 1  [ json_name = "product_id" ];
+  string name = 2       [ json_name = "name" ];
+  float price = 3       [ json_name = "price" ];
 }
 
-message Order {
-  uint32 orderID = 1;
-  uint32 customerID = 2;
-  uint32 productID = 3;
-  uint32 quantity = 4;
+message OrderItem {
+  uint32 productID = 2;
+  uint32 quantity = 3;
 }
 
 message GetMenuRequest {}
 
 message GetMenuResponse {
-  Product product = 1;
+  Product product = 1 [ json_name = "product" ];
 }
 
 message CreateOrderRequest {
   uint32 customerID = 1;
-  uint32 productID = 2;
-  uint32 quantity = 3;
+  repeated OrderItem orderItems = 2;
 }
 
 message CreateOrderResponse {
-  repeated Order orders = 1 ;
+  uint32 orderID = 1;
+}
+
+message ListOfProducts {
+  repeated Product products = 1 [ json_name = "products" ];
 }

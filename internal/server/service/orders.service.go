@@ -2,64 +2,56 @@ package service
 
 import (
 	"context"
-	"math/rand"
 	"time"
 
 	pb "github.com/MauricioGZ/GRPC-GO/internal/gen"
-	"github.com/MauricioGZ/GRPC-GO/internal/server/repository"
 )
 
-type server struct {
-	repo repository.Repository
-	pb.UnimplementedOrdersServiceServer
-}
-
-var orders []*pb.Order
-
-func New(_repo repository.Repository) *server {
-	return &server{
-		repo: _repo,
-	}
-}
-
 func (s *server) CreateOrder(ctx context.Context, req *pb.CreateOrderRequest) (*pb.CreateOrderResponse, error) {
-	var order pb.Order = pb.Order{
-		OrderID:    generateID(),
-		CustomerID: req.CustomerID,
-		ProductID:  req.ProductID,
-		Quantity:   req.Quantity,
+	//check if the passed product's ids do exist
+	var totalPrice float32 = 0.0
+	for _, order := range req.GetOrderItems() {
+		price, err := s.repo.GetProductPriceByID(
+			ctx,
+			order.GetProductID(),
+		)
+
+		if price == nil {
+			if err != nil {
+				return nil, err
+			}
+			//TODO: implement an error message if the product does not exist
+		}
+		totalPrice += *price
 	}
 
-	orders = append(orders, &order)
+	//register the order
+	orderID, err := s.repo.InsertOrder(
+		ctx,
+		req.GetCustomerID(),
+		time.Now(),
+		"pending",
+		totalPrice,
+	)
+
+	if err != nil {
+		return nil, err
+	}
+
+	//register each order item
+	for _, order := range req.GetOrderItems() {
+		err = s.repo.InsertOrderItem(
+			ctx,
+			*orderID,
+			order.GetProductID(),
+			order.GetQuantity(),
+		)
+		if err != nil {
+			return nil, err
+		}
+	}
 
 	return &pb.CreateOrderResponse{
-		Orders: orders,
+		OrderID: *orderID,
 	}, nil
-
-}
-
-func generateID() uint32 {
-	r := rand.New(rand.NewSource(time.Now().Unix()))
-	return r.Uint32()
-}
-
-func (s *server) GetMenu(req *pb.GetMenuRequest, stream pb.OrdersService_GetMenuServer) error {
-
-	products, err := s.repo.GetAllProducts(context.Background())
-	if err != nil {
-		return err
-	}
-	for _, p := range products {
-		res := &pb.GetMenuResponse{
-			Product: &pb.Product{
-				ProductID: p.ID,
-				Name:      p.Name,
-				Price:     p.Price,
-			},
-		}
-		if err := stream.Send(res); err != nil {
-			return err
-		}
-	}
-	return nil
 }

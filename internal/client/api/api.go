@@ -4,16 +4,16 @@ import (
 	"log"
 	"net/http"
 
-	pb "github.com/MauricioGZ/GRPC-GO/internal/gen"
+	"github.com/MauricioGZ/GRPC-GO/internal/client/service"
 )
 
 type api struct {
-	client pb.OrdersServiceClient
+	serv service.Service
 }
 
-func New(_client pb.OrdersServiceClient) *api {
+func New(_serv service.Service) *api {
 	return &api{
-		client: _client,
+		serv: _serv,
 	}
 }
 
