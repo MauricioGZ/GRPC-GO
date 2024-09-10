@@ -10,7 +10,7 @@ import (
 )
 
 func (a *api) CreateOrder(w http.ResponseWriter, r *http.Request) {
-	//w.Header().Add("Content-Type", "application/json")
+	w.Header().Add("Content-Type", "application/json")
 
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second*10)
 	defer cancel()

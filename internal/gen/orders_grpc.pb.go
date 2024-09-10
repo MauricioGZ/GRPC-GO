@@ -161,3 +161,108 @@ var OrdersService_ServiceDesc = grpc.ServiceDesc{
 	},
 	Metadata: "orders.proto",
 }
+
+const (
+	RestaurantService_GetPendingOrders_FullMethodName = "/orders_service.RestaurantService/GetPendingOrders"
+)
+
+// RestaurantServiceClient is the client API for RestaurantService service.
+//
+// For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
+type RestaurantServiceClient interface {
+	GetPendingOrders(ctx context.Context, in *GetPendingOrdersRequest, opts ...grpc.CallOption) (grpc.ServerStreamingClient[GetPendingOrdersResponse], error)
+}
+
+type restaurantServiceClient struct {
+	cc grpc.ClientConnInterface
+}
+
+func NewRestaurantServiceClient(cc grpc.ClientConnInterface) RestaurantServiceClient {
+	return &restaurantServiceClient{cc}
+}
+
+func (c *restaurantServiceClient) GetPendingOrders(ctx context.Context, in *GetPendingOrdersRequest, opts ...grpc.CallOption) (grpc.ServerStreamingClient[GetPendingOrdersResponse], error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	stream, err := c.cc.NewStream(ctx, &RestaurantService_ServiceDesc.Streams[0], RestaurantService_GetPendingOrders_FullMethodName, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	x := &grpc.GenericClientStream[GetPendingOrdersRequest, GetPendingOrdersResponse]{ClientStream: stream}
+	if err := x.ClientStream.SendMsg(in); err != nil {
+		return nil, err
+	}
+	if err := x.ClientStream.CloseSend(); err != nil {
+		return nil, err
+	}
+	return x, nil
+}
+
+// This type alias is provided for backwards compatibility with existing code that references the prior non-generic stream type by name.
+type RestaurantService_GetPendingOrdersClient = grpc.ServerStreamingClient[GetPendingOrdersResponse]
+
+// RestaurantServiceServer is the server API for RestaurantService service.
+// All implementations must embed UnimplementedRestaurantServiceServer
+// for forward compatibility.
+type RestaurantServiceServer interface {
+	GetPendingOrders(*GetPendingOrdersRequest, grpc.ServerStreamingServer[GetPendingOrdersResponse]) error
+	mustEmbedUnimplementedRestaurantServiceServer()
+}
+
+// UnimplementedRestaurantServiceServer must be embedded to have
+// forward compatible implementations.
+//
+// NOTE: this should be embedded by value instead of pointer to avoid a nil
+// pointer dereference when methods are called.
+type UnimplementedRestaurantServiceServer struct{}
+
+func (UnimplementedRestaurantServiceServer) GetPendingOrders(*GetPendingOrdersRequest, grpc.ServerStreamingServer[GetPendingOrdersResponse]) error {
+	return status.Errorf(codes.Unimplemented, "method GetPendingOrders not implemented")
+}
+func (UnimplementedRestaurantServiceServer) mustEmbedUnimplementedRestaurantServiceServer() {}
+func (UnimplementedRestaurantServiceServer) testEmbeddedByValue()                           {}
+
+// UnsafeRestaurantServiceServer may be embedded to opt out of forward compatibility for this service.
+// Use of this interface is not recommended, as added methods to RestaurantServiceServer will
+// result in compilation errors.
+type UnsafeRestaurantServiceServer interface {
+	mustEmbedUnimplementedRestaurantServiceServer()
+}
+
+func RegisterRestaurantServiceServer(s grpc.ServiceRegistrar, srv RestaurantServiceServer) {
+	// If the following call pancis, it indicates UnimplementedRestaurantServiceServer was
+	// embedded by pointer and is nil.  This will cause panics if an
+	// unimplemented method is ever invoked, so we test this at initialization
+	// time to prevent it from happening at runtime later due to I/O.
+	if t, ok := srv.(interface{ testEmbeddedByValue() }); ok {
+		t.testEmbeddedByValue()
+	}
+	s.RegisterService(&RestaurantService_ServiceDesc, srv)
+}
+
+func _RestaurantService_GetPendingOrders_Handler(srv interface{}, stream grpc.ServerStream) error {
+	m := new(GetPendingOrdersRequest)
+	if err := stream.RecvMsg(m); err != nil {
+		return err
+	}
+	return srv.(RestaurantServiceServer).GetPendingOrders(m, &grpc.GenericServerStream[GetPendingOrdersRequest, GetPendingOrdersResponse]{ServerStream: stream})
+}
+
+// This type alias is provided for backwards compatibility with existing code that references the prior non-generic stream type by name.
+type RestaurantService_GetPendingOrdersServer = grpc.ServerStreamingServer[GetPendingOrdersResponse]
+
+// RestaurantService_ServiceDesc is the grpc.ServiceDesc for RestaurantService service.
+// It's only intended for direct use with grpc.RegisterService,
+// and not to be introspected or modified (even as a copy)
+var RestaurantService_ServiceDesc = grpc.ServiceDesc{
+	ServiceName: "orders_service.RestaurantService",
+	HandlerType: (*RestaurantServiceServer)(nil),
+	Methods:     []grpc.MethodDesc{},
+	Streams: []grpc.StreamDesc{
+		{
+			StreamName:    "GetPendingOrders",
+			Handler:       _RestaurantService_GetPendingOrders_Handler,
+			ServerStreams: true,
+		},
+	},
+	Metadata: "orders.proto",
+}

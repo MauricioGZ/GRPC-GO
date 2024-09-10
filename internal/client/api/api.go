@@ -4,14 +4,14 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/MauricioGZ/GRPC-GO/internal/client/service"
+	cs "github.com/MauricioGZ/GRPC-GO/internal/client/service"
 )
 
 type api struct {
-	serv service.Service
+	serv cs.Service
 }
 
-func New(_serv service.Service) *api {
+func New(_serv cs.Service) *api {
 	return &api{
 		serv: _serv,
 	}
