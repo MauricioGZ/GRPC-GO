@@ -14,6 +14,7 @@ type Repository interface {
 	InsertOrder(ctx context.Context, customerID uint32, orderDate time.Time, status string, totalPrice float32) (*uint32, error)
 	InsertOrderItem(ctx context.Context, orderID, productID, quantity uint32) error
 	GetPendingOrders(ctx context.Context) ([]entity.Order, error)
+	GetOrderItemsByOrderID(ctx context.Context, orderID uint32) ([]entity.OrderItem, error)
 }
 
 type repo struct {

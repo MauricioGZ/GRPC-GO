@@ -2,14 +2,14 @@ package service
 
 import (
 	"context"
-	"fmt"
 	"io"
 	"log"
 
 	pb "github.com/MauricioGZ/GRPC-GO/internal/gen"
 )
 
-func (s *serv) GetPendingOrders(ctx context.Context) error {
+func (s *serv) GetPendingOrders(ctx context.Context) ([]*pb.GetPendingOrdersResponse, error) {
+	var pendingOrders []*pb.GetPendingOrdersResponse
 	done := make(chan bool)
 	orders, err := s.client.GetPendingOrders(ctx, &pb.GetPendingOrdersRequest{})
 	if err != nil {
@@ -25,9 +25,9 @@ func (s *serv) GetPendingOrders(ctx context.Context) error {
 				}
 				log.Fatal(err)
 			}
-			fmt.Println(res)
+			pendingOrders = append(pendingOrders, res)
 		}
 	}()
 	<-done
-	return nil
+	return pendingOrders, nil
 }

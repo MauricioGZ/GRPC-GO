@@ -7,7 +7,7 @@ import (
 )
 
 type Service interface {
-	GetPendingOrders(ctx context.Context) error
+	GetPendingOrders(ctx context.Context) ([]*pb.GetPendingOrdersResponse, error)
 }
 
 type serv struct {

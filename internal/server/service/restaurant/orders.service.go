@@ -12,15 +12,39 @@ func (s *service) GetPendingOrders(req *pb.GetPendingOrdersRequest, stream pb.Re
 	if err != nil {
 		return err
 	}
+
 	for _, order := range orders {
+		orderItems, err := s.wrapOrderItems(context.Background(), order.ID)
+		if err != nil {
+			return err
+		}
 		res := &pb.GetPendingOrdersResponse{
-			OrderID:    order.ID,
-			CustomerID: order.CustomerID,
-			OrderDate:  timestamppb.New(order.OrderDate),
+			OrderID:                order.ID,
+			CustomerID:             order.CustomerID,
+			OrderDate:              timestamppb.New(order.OrderDate),
+			OrderItemByProductName: orderItems,
 		}
 		if err := stream.Send(res); err != nil {
 			return err
 		}
 	}
 	return nil
+}
+
+func (s *service) wrapOrderItems(ctx context.Context, orderID uint32) ([]*pb.OrderItemByProductName, error) {
+	var orderItems []*pb.OrderItemByProductName
+	ooii, err := s.repo.GetOrderItemsByOrderID(ctx, orderID)
+	if err != nil {
+		return nil, err
+	}
+
+	for _, oi := range ooii {
+		orderItems = append(orderItems,
+			&pb.OrderItemByProductName{
+				Name:     oi.ProductName,
+				Quantity: oi.Quantity,
+			})
+	}
+
+	return orderItems, nil
 }

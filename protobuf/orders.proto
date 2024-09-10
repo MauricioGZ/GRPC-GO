@@ -26,6 +26,11 @@ message OrderItem {
   uint32 quantity = 3;
 }
 
+message OrderItemByProductName {
+  string name = 1;
+  uint32 quantity = 2;
+}
+
 message GetMenuRequest {}
 
 message GetMenuResponse {
@@ -51,4 +56,5 @@ message GetPendingOrdersResponse {
   uint32 orderID = 1;
   uint32 customerID = 2;
   google.protobuf.Timestamp orderDate = 3;
+  repeated OrderItemByProductName orderItemByProductName = 4;
 }

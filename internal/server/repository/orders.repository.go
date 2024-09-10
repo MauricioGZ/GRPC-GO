@@ -2,6 +2,7 @@ package repository
 
 import (
 	"context"
+	"database/sql"
 	"time"
 
 	"github.com/MauricioGZ/GRPC-GO/internal/server/entity"
@@ -62,6 +63,9 @@ func (r *repo) GetPendingOrders(ctx context.Context) ([]entity.Order, error) {
 	)
 
 	if err != nil {
+		if err == sql.ErrNoRows {
+			return nil, nil
+		}
 		return nil, err
 	}
 
