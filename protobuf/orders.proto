@@ -1,4 +1,6 @@
 syntax = "proto3";
+  
+import "google/protobuf/timestamp.proto";
 
 option go_package = "github.com/MauricioGZ/GRPC-GO/proto";
 
@@ -7,6 +9,10 @@ package orders_service;
 service OrdersService {
   rpc GetMenu(GetMenuRequest) returns (stream GetMenuResponse);
   rpc CreateOrder(CreateOrderRequest) returns (CreateOrderResponse);
+}
+
+service RestaurantService {
+  rpc GetPendingOrders(GetPendingOrdersRequest) returns (stream GetPendingOrdersResponse);
 }
 
 message Product {
@@ -37,4 +43,12 @@ message CreateOrderResponse {
 
 message ListOfProducts {
   repeated Product products = 1 [ json_name = "products" ];
+}
+
+message GetPendingOrdersRequest {}
+
+message GetPendingOrdersResponse {
+  uint32 orderID = 1;
+  uint32 customerID = 2;
+  google.protobuf.Timestamp orderDate = 3;
 }

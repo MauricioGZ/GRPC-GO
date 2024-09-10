@@ -1,4 +1,4 @@
-package service
+package client_service
 
 import (
 	"context"
@@ -7,7 +7,7 @@ import (
 	pb "github.com/MauricioGZ/GRPC-GO/internal/gen"
 )
 
-func (s *server) CreateOrder(ctx context.Context, req *pb.CreateOrderRequest) (*pb.CreateOrderResponse, error) {
+func (s *service) CreateOrder(ctx context.Context, req *pb.CreateOrderRequest) (*pb.CreateOrderResponse, error) {
 	//check if the passed product's ids do exist
 	var totalPrice float32 = 0.0
 	for _, order := range req.GetOrderItems() {

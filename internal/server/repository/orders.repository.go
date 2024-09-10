@@ -3,6 +3,8 @@ package repository
 import (
 	"context"
 	"time"
+
+	"github.com/MauricioGZ/GRPC-GO/internal/server/entity"
 )
 
 const (
@@ -13,7 +15,13 @@ const (
 											totalPrice
 											)
 										values (?,?,?,?)`
-	qryLastInsertID = `select LAST_INSERT_ID();`
+	qryLastInsertID     = `	select LAST_INSERT_ID();`
+	qryGetPendingOrders = `	select
+														id,
+														customerId,
+														orderDate
+													from ORDERS
+													where status = "pending";`
 )
 
 func (r *repo) InsertOrder(ctx context.Context, customerID uint32, orderDate time.Time, status string, totalPrice float32) (*uint32, error) {
@@ -43,4 +51,31 @@ func (r *repo) InsertOrder(ctx context.Context, customerID uint32, orderDate tim
 	}
 
 	return &orderID, err
+}
+
+func (r *repo) GetPendingOrders(ctx context.Context) ([]entity.Order, error) {
+	var order entity.Order
+	var orders []entity.Order
+	rows, err := r.db.QueryContext(
+		ctx,
+		qryGetPendingOrders,
+	)
+
+	if err != nil {
+		return nil, err
+	}
+
+	for rows.Next() {
+		err = rows.Scan(
+			&order.ID,
+			&order.CustomerID,
+			&order.OrderDate,
+		)
+		if err != nil {
+			return nil, err
+		}
+		orders = append(orders, order)
+	}
+
+	return orders, nil
 }

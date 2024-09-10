@@ -1,4 +1,4 @@
-package service
+package client_service
 
 import (
 	"context"
@@ -6,7 +6,7 @@ import (
 	pb "github.com/MauricioGZ/GRPC-GO/internal/gen"
 )
 
-func (s *server) GetMenu(req *pb.GetMenuRequest, stream pb.OrdersService_GetMenuServer) error {
+func (s *service) GetMenu(req *pb.GetMenuRequest, stream pb.OrdersService_GetMenuServer) error {
 
 	products, err := s.repo.GetAllProducts(context.Background())
 	if err != nil {
