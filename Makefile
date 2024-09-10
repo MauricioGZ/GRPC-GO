@@ -1,6 +1,9 @@
 run-client:
 	@go run cmd/client/*.go
 
+run-restaurant:
+	@go run cmd/restaurant/*.go
+
 run-server:
 	@go run cmd/server/*.go
 
