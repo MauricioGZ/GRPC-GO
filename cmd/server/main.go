@@ -7,7 +7,9 @@ import (
 	pb "github.com/MauricioGZ/GRPC-GO/internal/gen"
 	"github.com/MauricioGZ/GRPC-GO/internal/server/db"
 	"github.com/MauricioGZ/GRPC-GO/internal/server/repository"
-	serverService "github.com/MauricioGZ/GRPC-GO/internal/server/service"
+	client_service "github.com/MauricioGZ/GRPC-GO/internal/server/service/client"
+	restaurant_service "github.com/MauricioGZ/GRPC-GO/internal/server/service/restaurant"
+
 	"github.com/MauricioGZ/GRPC-GO/settings"
 	"google.golang.org/grpc"
 )
@@ -37,7 +39,9 @@ func main() {
 	}
 
 	grpcServer := grpc.NewServer()
-	pb.RegisterOrdersServiceServer(grpcServer, serverService.New(r))
+	pb.RegisterOrdersServiceServer(grpcServer, client_service.New(r))
+	pb.RegisterRestaurantServiceServer(grpcServer, restaurant_service.New(r))
+
 	if err := grpcServer.Serve(lis); err != nil {
 		log.Fatalf("Failed to start: %s", err.Error())
 	}
