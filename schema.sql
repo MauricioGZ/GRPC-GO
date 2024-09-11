@@ -13,11 +13,11 @@ create table ORDERS(
   id int not null auto_increment,
   customerId int not null,
   orderDate date not null,
-  status enum('pending','shipped','completed','canceled') not null,
+  status enum('pending','ready','completed','canceled') not null,
   totalPrice decimal(10,2) not null,
   check (totalPrice >= 0),
   primary key(id)
-);
+);   
 
 create table ORDER_ITEMS(
   id int not null auto_increment,

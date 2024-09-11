@@ -13,6 +13,7 @@ service OrdersService {
 
 service RestaurantService {
   rpc GetPendingOrders(GetPendingOrdersRequest) returns (stream GetPendingOrdersResponse);
+  rpc SetOrderToReady(SetOrderToReadyRequest) returns (SetOrderToReadyResponse);
 }
 
 message Product {
@@ -58,3 +59,9 @@ message GetPendingOrdersResponse {
   google.protobuf.Timestamp orderDate = 3;
   repeated OrderItemByProductName orderItemByProductName = 4;
 }
+
+message SetOrderToReadyRequest {
+  uint32 orderID = 1;
+}
+
+message SetOrderToReadyResponse {}

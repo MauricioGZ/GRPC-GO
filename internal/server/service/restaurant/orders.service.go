@@ -31,6 +31,20 @@ func (s *service) GetPendingOrders(req *pb.GetPendingOrdersRequest, stream pb.Re
 	return nil
 }
 
+func (s *service) SetOrderToReady(ctx context.Context, req *pb.SetOrderToReadyRequest) (*pb.SetOrderToReadyResponse, error) {
+	//check if the order does exist
+	_, err := s.repo.GetOrderByID(ctx, req.OrderID)
+	if err != nil {
+		return nil, err
+	}
+
+	err = s.repo.UpdateOrderStatus(ctx, "ready", req.OrderID)
+	if err != nil {
+		return nil, err
+	}
+	return &pb.SetOrderToReadyResponse{}, nil
+}
+
 func (s *service) wrapOrderItems(ctx context.Context, orderID uint32) ([]*pb.OrderItemByProductName, error) {
 	var orderItems []*pb.OrderItemByProductName
 	ooii, err := s.repo.GetOrderItemsByOrderID(ctx, orderID)

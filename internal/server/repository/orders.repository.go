@@ -9,6 +9,14 @@ import (
 )
 
 const (
+	qryGetOrderByID = ` select
+												id,
+												customerid,
+												orderDate,
+												status,
+												totalPrice
+											from ORDERS
+											where id = ?;`
 	qryInsertOrder = `insert into ORDERS(
 											customerId,
 											orderDate,
@@ -23,7 +31,37 @@ const (
 														orderDate
 													from ORDERS
 													where status = "pending";`
+	qryUpdateOrderStatus = `	update ORDERS
+														set
+															status = ?
+														where id = ?;`
 )
+
+func (r *repo) GetOrderByID(ctx context.Context, orderID uint32) (*entity.Order, error) {
+	var order entity.Order
+	row := r.db.QueryRowContext(
+		ctx,
+		qryGetOrderByID,
+		orderID,
+	)
+
+	err := row.Scan(
+		&order.ID,
+		&order.CustomerID,
+		&order.OrderDate,
+		&order.Status,
+		&order.TotalPrice,
+	)
+
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return nil, nil
+		}
+		return nil, err
+	}
+
+	return &order, nil
+}
 
 func (r *repo) InsertOrder(ctx context.Context, customerID uint32, orderDate time.Time, status string, totalPrice float32) (*uint32, error) {
 	var orderID uint32
@@ -82,4 +120,14 @@ func (r *repo) GetPendingOrders(ctx context.Context) ([]entity.Order, error) {
 	}
 
 	return orders, nil
+}
+
+func (r *repo) UpdateOrderStatus(ctx context.Context, status string, orderID uint32) error {
+	_, err := r.db.ExecContext(
+		ctx,
+		qryUpdateOrderStatus,
+		status,
+		orderID,
+	)
+	return err
 }

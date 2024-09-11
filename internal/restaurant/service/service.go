@@ -8,6 +8,7 @@ import (
 
 type Service interface {
 	GetPendingOrders(ctx context.Context) ([]*pb.GetPendingOrdersResponse, error)
+	SetOrderToReady(ctx context.Context, _orderID uint32) error
 }
 
 type serv struct {

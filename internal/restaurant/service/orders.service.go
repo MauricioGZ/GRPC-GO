@@ -31,3 +31,8 @@ func (s *serv) GetPendingOrders(ctx context.Context) ([]*pb.GetPendingOrdersResp
 	<-done
 	return pendingOrders, nil
 }
+
+func (s *serv) SetOrderToReady(ctx context.Context, _orderID uint32) error {
+	_, err := s.client.SetOrderToReady(ctx, &pb.SetOrderToReadyRequest{OrderID: _orderID})
+	return err
+}

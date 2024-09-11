@@ -21,6 +21,6 @@ func (a *api) Run() error {
 	router := http.NewServeMux()
 	a.registerRoutes(router)
 
-	log.Println("Starting server on ", "9000")
+	log.Println("Starting server on ", "9090")
 	return http.ListenAndServe(":9090", router)
 }

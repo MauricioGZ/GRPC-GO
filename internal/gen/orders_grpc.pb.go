@@ -164,6 +164,7 @@ var OrdersService_ServiceDesc = grpc.ServiceDesc{
 
 const (
 	RestaurantService_GetPendingOrders_FullMethodName = "/orders_service.RestaurantService/GetPendingOrders"
+	RestaurantService_SetOrderToReady_FullMethodName  = "/orders_service.RestaurantService/SetOrderToReady"
 )
 
 // RestaurantServiceClient is the client API for RestaurantService service.
@@ -171,6 +172,7 @@ const (
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type RestaurantServiceClient interface {
 	GetPendingOrders(ctx context.Context, in *GetPendingOrdersRequest, opts ...grpc.CallOption) (grpc.ServerStreamingClient[GetPendingOrdersResponse], error)
+	SetOrderToReady(ctx context.Context, in *SetOrderToReadyRequest, opts ...grpc.CallOption) (*SetOrderToReadyResponse, error)
 }
 
 type restaurantServiceClient struct {
@@ -200,11 +202,22 @@ func (c *restaurantServiceClient) GetPendingOrders(ctx context.Context, in *GetP
 // This type alias is provided for backwards compatibility with existing code that references the prior non-generic stream type by name.
 type RestaurantService_GetPendingOrdersClient = grpc.ServerStreamingClient[GetPendingOrdersResponse]
 
+func (c *restaurantServiceClient) SetOrderToReady(ctx context.Context, in *SetOrderToReadyRequest, opts ...grpc.CallOption) (*SetOrderToReadyResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(SetOrderToReadyResponse)
+	err := c.cc.Invoke(ctx, RestaurantService_SetOrderToReady_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // RestaurantServiceServer is the server API for RestaurantService service.
 // All implementations must embed UnimplementedRestaurantServiceServer
 // for forward compatibility.
 type RestaurantServiceServer interface {
 	GetPendingOrders(*GetPendingOrdersRequest, grpc.ServerStreamingServer[GetPendingOrdersResponse]) error
+	SetOrderToReady(context.Context, *SetOrderToReadyRequest) (*SetOrderToReadyResponse, error)
 	mustEmbedUnimplementedRestaurantServiceServer()
 }
 
@@ -217,6 +230,9 @@ type UnimplementedRestaurantServiceServer struct{}
 
 func (UnimplementedRestaurantServiceServer) GetPendingOrders(*GetPendingOrdersRequest, grpc.ServerStreamingServer[GetPendingOrdersResponse]) error {
 	return status.Errorf(codes.Unimplemented, "method GetPendingOrders not implemented")
+}
+func (UnimplementedRestaurantServiceServer) SetOrderToReady(context.Context, *SetOrderToReadyRequest) (*SetOrderToReadyResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method SetOrderToReady not implemented")
 }
 func (UnimplementedRestaurantServiceServer) mustEmbedUnimplementedRestaurantServiceServer() {}
 func (UnimplementedRestaurantServiceServer) testEmbeddedByValue()                           {}
@@ -250,13 +266,36 @@ func _RestaurantService_GetPendingOrders_Handler(srv interface{}, stream grpc.Se
 // This type alias is provided for backwards compatibility with existing code that references the prior non-generic stream type by name.
 type RestaurantService_GetPendingOrdersServer = grpc.ServerStreamingServer[GetPendingOrdersResponse]
 
+func _RestaurantService_SetOrderToReady_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(SetOrderToReadyRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(RestaurantServiceServer).SetOrderToReady(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: RestaurantService_SetOrderToReady_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(RestaurantServiceServer).SetOrderToReady(ctx, req.(*SetOrderToReadyRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // RestaurantService_ServiceDesc is the grpc.ServiceDesc for RestaurantService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
 var RestaurantService_ServiceDesc = grpc.ServiceDesc{
 	ServiceName: "orders_service.RestaurantService",
 	HandlerType: (*RestaurantServiceServer)(nil),
-	Methods:     []grpc.MethodDesc{},
+	Methods: []grpc.MethodDesc{
+		{
+			MethodName: "SetOrderToReady",
+			Handler:    _RestaurantService_SetOrderToReady_Handler,
+		},
+	},
 	Streams: []grpc.StreamDesc{
 		{
 			StreamName:    "GetPendingOrders",
