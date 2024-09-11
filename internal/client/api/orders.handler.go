@@ -2,31 +2,35 @@ package api
 
 import (
 	"context"
-	"encoding/json"
-	"fmt"
-	"log"
 	"net/http"
 	"time"
+
+	"github.com/MauricioGZ/GRPC-GO/internal/client/api/dto"
+	"github.com/MauricioGZ/GRPC-GO/internal/utils"
 )
 
 func (a *api) CreateOrder(w http.ResponseWriter, r *http.Request) {
-	w.Header().Add("Content-Type", "application/json")
+	var orderItems []dto.OrderItem
+	err := utils.ParseJSON(r, &orderItems)
+	if err != nil {
+		utils.JSONErrorResponse(w, http.StatusInternalServerError, err)
+		return
+	}
 
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second*10)
 	defer cancel()
 
-	orderID, err := a.serv.CreateOrder(ctx)
+	order, err := a.serv.CreateOrder(ctx, orderItems)
 
 	if err != nil {
-		fmt.Println(err)
-		w.WriteHeader(http.StatusInternalServerError)
+		utils.JSONErrorResponse(w, http.StatusInternalServerError, err)
 		return
 	}
 
-	w.WriteHeader(http.StatusOK)
-	if err := json.NewEncoder(w).Encode(struct {
-		OrderID uint32 `json:"order_id"`
-	}{OrderID: orderID}); err != nil {
-		log.Fatal(err)
+	err = utils.JSONAnyResponse(w, http.StatusOK, order)
+
+	if err != nil {
+		utils.JSONErrorResponse(w, http.StatusInternalServerError, err)
+		return
 	}
 }

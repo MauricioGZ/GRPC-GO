@@ -3,12 +3,14 @@ package service
 import (
 	"context"
 
+	"github.com/MauricioGZ/GRPC-GO/internal/client/api/dto"
+	"github.com/MauricioGZ/GRPC-GO/internal/client/model"
 	pb "github.com/MauricioGZ/GRPC-GO/internal/gen"
 )
 
 type Service interface {
-	CreateOrder(ctx context.Context) (uint32, error)
-	GetAllProducts(ctx context.Context) ([]*pb.Product, error)
+	CreateOrder(ctx context.Context, orderItems []dto.OrderItem) (model.OrderResponse, error)
+	GetAllProducts(ctx context.Context) ([]model.Product, error)
 }
 
 type serv struct {

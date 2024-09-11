@@ -2,12 +2,12 @@ package api
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
-	"log"
 	"net/http"
 	"strconv"
 	"time"
+
+	"github.com/MauricioGZ/GRPC-GO/internal/utils"
 )
 
 func (a *api) GetPendingOrders(w http.ResponseWriter, r *http.Request) {
@@ -18,14 +18,15 @@ func (a *api) GetPendingOrders(w http.ResponseWriter, r *http.Request) {
 	pendingOrders, err := a.serv.GetPendingOrders(ctx)
 
 	if err != nil {
-		fmt.Println(err)
-		w.WriteHeader(http.StatusInternalServerError)
+		utils.JSONErrorResponse(w, http.StatusInternalServerError, err)
 		return
 	}
 
-	w.WriteHeader(http.StatusOK)
-	if err := json.NewEncoder(w).Encode(pendingOrders); err != nil {
-		log.Fatal(err)
+	err = utils.JSONAnyResponse(w, http.StatusOK, pendingOrders)
+
+	if err != nil {
+		utils.JSONErrorResponse(w, http.StatusInternalServerError, err)
+		return
 	}
 }
 
@@ -35,18 +36,18 @@ func (a *api) SetOrderToReady(w http.ResponseWriter, r *http.Request) {
 	defer cancel()
 
 	orderID, err := strconv.ParseUint(orderIDString, 10, 32)
+
 	if err != nil {
-		fmt.Println(err)
-		w.WriteHeader(http.StatusInternalServerError)
+		utils.JSONErrorResponse(w, http.StatusInternalServerError, err)
 		return
 	}
+
 	err = a.serv.SetOrderToReady(ctx, uint32(orderID))
 
 	if err != nil {
-		fmt.Println(err)
-		w.WriteHeader(http.StatusInternalServerError)
+		utils.JSONErrorResponse(w, http.StatusInternalServerError, err)
 		return
 	}
 
-	w.WriteHeader(http.StatusOK)
+	utils.JSONMessageResponse(w, http.StatusOK, fmt.Sprintf("order_id: %d set to ready", orderID))
 }

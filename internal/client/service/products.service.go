@@ -5,11 +5,13 @@ import (
 	"io"
 	"log"
 
+	"github.com/MauricioGZ/GRPC-GO/internal/client/model"
 	pb "github.com/MauricioGZ/GRPC-GO/internal/gen"
 )
 
-func (s *serv) GetAllProducts(ctx context.Context) ([]*pb.Product, error) {
-	var listOfProducts pb.ListOfProducts
+func (s *serv) GetAllProducts(ctx context.Context) ([]model.Product, error) {
+	var product model.Product
+	var products []model.Product
 	done := make(chan bool)
 	menu, err := s.client.GetMenu(ctx, &pb.GetMenuRequest{})
 	if err != nil {
@@ -25,9 +27,14 @@ func (s *serv) GetAllProducts(ctx context.Context) ([]*pb.Product, error) {
 				}
 				log.Fatal(err)
 			}
-			listOfProducts.Products = append(listOfProducts.GetProducts(), res.GetProduct())
+			product = model.Product{
+				ProductID: res.GetProduct().GetProductID(),
+				Name:      res.GetProduct().GetName(),
+				Price:     res.GetProduct().GetPrice(),
+			}
+			products = append(products, product)
 		}
 	}()
 	<-done
-	return listOfProducts.GetProducts(), nil
+	return products, nil
 }

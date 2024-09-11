@@ -17,9 +17,9 @@ service RestaurantService {
 }
 
 message Product {
-  uint32 productID = 1  [ json_name = "product_id" ];
-  string name = 2       [ json_name = "name" ];
-  float price = 3       [ json_name = "price" ];
+  uint32 productID = 1;  
+  string name = 2;    
+  float price = 3;      
 }
 
 message OrderItem {
@@ -35,7 +35,7 @@ message OrderItemByProductName {
 message GetMenuRequest {}
 
 message GetMenuResponse {
-  Product product = 1 [ json_name = "product" ];
+  Product product = 1;
 }
 
 message CreateOrderRequest {
@@ -45,10 +45,6 @@ message CreateOrderRequest {
 
 message CreateOrderResponse {
   uint32 orderID = 1;
-}
-
-message ListOfProducts {
-  repeated Product products = 1 [ json_name = "products" ];
 }
 
 message GetPendingOrdersRequest {}

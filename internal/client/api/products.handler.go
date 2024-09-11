@@ -2,27 +2,27 @@ package api
 
 import (
 	"context"
-	"encoding/json"
-	"log"
 	"net/http"
 	"time"
+
+	"github.com/MauricioGZ/GRPC-GO/internal/utils"
 )
 
 func (a *api) getAllProducts(w http.ResponseWriter, r *http.Request) {
-	w.Header().Add("Content-Type", "application/json")
-
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second*10)
 	defer cancel()
 
 	products, err := a.serv.GetAllProducts(ctx)
 
 	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
+		utils.JSONErrorResponse(w, http.StatusInternalServerError, err)
 		return
 	}
 
-	w.WriteHeader(http.StatusOK)
-	if err := json.NewEncoder(w).Encode(products); err != nil {
-		log.Fatal(err)
+	err = utils.JSONAnyResponse(w, http.StatusOK, products)
+
+	if err != nil {
+		utils.JSONErrorResponse(w, http.StatusInternalServerError, err)
+		return
 	}
 }
