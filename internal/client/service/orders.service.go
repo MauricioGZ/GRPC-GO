@@ -19,9 +19,14 @@ func (s *serv) CreateOrder(ctx context.Context, orderItems []dto.OrderItem) (mod
 			})
 	}
 
-	orderID, err := s.client.CreateOrder(ctx, &pb.CreateOrderRequest{
+	createOrderResponse, err := s.client.CreateOrder(ctx, &pb.CreateOrderRequest{
 		CustomerID: 1,
 		OrderItems: orderItemsRequest,
 	})
-	return model.OrderResponse{OrderID: orderID.GetOrderID()}, err
+	return model.OrderResponse{OrderID: createOrderResponse.GetOrderID()}, err
+}
+
+func (s *serv) CancelOrder(ctx context.Context, orderID uint32) error {
+	_, err := s.client.CancelOrder(ctx, &pb.CancelOrderRequest{OrderID: orderID})
+	return err
 }

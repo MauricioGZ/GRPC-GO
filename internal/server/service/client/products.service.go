@@ -6,7 +6,7 @@ import (
 	pb "github.com/MauricioGZ/GRPC-GO/internal/gen"
 )
 
-func (s *service) GetMenu(req *pb.GetMenuRequest, stream pb.OrdersService_GetMenuServer) error {
+func (s *service) GetMenu(req *pb.GetMenuRequest, stream pb.ClientService_GetMenuServer) error {
 
 	products, err := s.repo.GetAllProducts(context.Background())
 	if err != nil {

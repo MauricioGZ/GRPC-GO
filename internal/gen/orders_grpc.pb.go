@@ -19,29 +19,31 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	OrdersService_GetMenu_FullMethodName     = "/orders_service.OrdersService/GetMenu"
-	OrdersService_CreateOrder_FullMethodName = "/orders_service.OrdersService/CreateOrder"
+	ClientService_GetMenu_FullMethodName     = "/orders_service.ClientService/GetMenu"
+	ClientService_CreateOrder_FullMethodName = "/orders_service.ClientService/CreateOrder"
+	ClientService_CancelOrder_FullMethodName = "/orders_service.ClientService/CancelOrder"
 )
 
-// OrdersServiceClient is the client API for OrdersService service.
+// ClientServiceClient is the client API for ClientService service.
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
-type OrdersServiceClient interface {
+type ClientServiceClient interface {
 	GetMenu(ctx context.Context, in *GetMenuRequest, opts ...grpc.CallOption) (grpc.ServerStreamingClient[GetMenuResponse], error)
 	CreateOrder(ctx context.Context, in *CreateOrderRequest, opts ...grpc.CallOption) (*CreateOrderResponse, error)
+	CancelOrder(ctx context.Context, in *CancelOrderRequest, opts ...grpc.CallOption) (*CancelOrderResponse, error)
 }
 
-type ordersServiceClient struct {
+type clientServiceClient struct {
 	cc grpc.ClientConnInterface
 }
 
-func NewOrdersServiceClient(cc grpc.ClientConnInterface) OrdersServiceClient {
-	return &ordersServiceClient{cc}
+func NewClientServiceClient(cc grpc.ClientConnInterface) ClientServiceClient {
+	return &clientServiceClient{cc}
 }
 
-func (c *ordersServiceClient) GetMenu(ctx context.Context, in *GetMenuRequest, opts ...grpc.CallOption) (grpc.ServerStreamingClient[GetMenuResponse], error) {
+func (c *clientServiceClient) GetMenu(ctx context.Context, in *GetMenuRequest, opts ...grpc.CallOption) (grpc.ServerStreamingClient[GetMenuResponse], error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	stream, err := c.cc.NewStream(ctx, &OrdersService_ServiceDesc.Streams[0], OrdersService_GetMenu_FullMethodName, cOpts...)
+	stream, err := c.cc.NewStream(ctx, &ClientService_ServiceDesc.Streams[0], ClientService_GetMenu_FullMethodName, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -56,106 +58,142 @@ func (c *ordersServiceClient) GetMenu(ctx context.Context, in *GetMenuRequest, o
 }
 
 // This type alias is provided for backwards compatibility with existing code that references the prior non-generic stream type by name.
-type OrdersService_GetMenuClient = grpc.ServerStreamingClient[GetMenuResponse]
+type ClientService_GetMenuClient = grpc.ServerStreamingClient[GetMenuResponse]
 
-func (c *ordersServiceClient) CreateOrder(ctx context.Context, in *CreateOrderRequest, opts ...grpc.CallOption) (*CreateOrderResponse, error) {
+func (c *clientServiceClient) CreateOrder(ctx context.Context, in *CreateOrderRequest, opts ...grpc.CallOption) (*CreateOrderResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(CreateOrderResponse)
-	err := c.cc.Invoke(ctx, OrdersService_CreateOrder_FullMethodName, in, out, cOpts...)
+	err := c.cc.Invoke(ctx, ClientService_CreateOrder_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-// OrdersServiceServer is the server API for OrdersService service.
-// All implementations must embed UnimplementedOrdersServiceServer
-// for forward compatibility.
-type OrdersServiceServer interface {
-	GetMenu(*GetMenuRequest, grpc.ServerStreamingServer[GetMenuResponse]) error
-	CreateOrder(context.Context, *CreateOrderRequest) (*CreateOrderResponse, error)
-	mustEmbedUnimplementedOrdersServiceServer()
+func (c *clientServiceClient) CancelOrder(ctx context.Context, in *CancelOrderRequest, opts ...grpc.CallOption) (*CancelOrderResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(CancelOrderResponse)
+	err := c.cc.Invoke(ctx, ClientService_CancelOrder_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
 }
 
-// UnimplementedOrdersServiceServer must be embedded to have
+// ClientServiceServer is the server API for ClientService service.
+// All implementations must embed UnimplementedClientServiceServer
+// for forward compatibility.
+type ClientServiceServer interface {
+	GetMenu(*GetMenuRequest, grpc.ServerStreamingServer[GetMenuResponse]) error
+	CreateOrder(context.Context, *CreateOrderRequest) (*CreateOrderResponse, error)
+	CancelOrder(context.Context, *CancelOrderRequest) (*CancelOrderResponse, error)
+	mustEmbedUnimplementedClientServiceServer()
+}
+
+// UnimplementedClientServiceServer must be embedded to have
 // forward compatible implementations.
 //
 // NOTE: this should be embedded by value instead of pointer to avoid a nil
 // pointer dereference when methods are called.
-type UnimplementedOrdersServiceServer struct{}
+type UnimplementedClientServiceServer struct{}
 
-func (UnimplementedOrdersServiceServer) GetMenu(*GetMenuRequest, grpc.ServerStreamingServer[GetMenuResponse]) error {
+func (UnimplementedClientServiceServer) GetMenu(*GetMenuRequest, grpc.ServerStreamingServer[GetMenuResponse]) error {
 	return status.Errorf(codes.Unimplemented, "method GetMenu not implemented")
 }
-func (UnimplementedOrdersServiceServer) CreateOrder(context.Context, *CreateOrderRequest) (*CreateOrderResponse, error) {
+func (UnimplementedClientServiceServer) CreateOrder(context.Context, *CreateOrderRequest) (*CreateOrderResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CreateOrder not implemented")
 }
-func (UnimplementedOrdersServiceServer) mustEmbedUnimplementedOrdersServiceServer() {}
-func (UnimplementedOrdersServiceServer) testEmbeddedByValue()                       {}
+func (UnimplementedClientServiceServer) CancelOrder(context.Context, *CancelOrderRequest) (*CancelOrderResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method CancelOrder not implemented")
+}
+func (UnimplementedClientServiceServer) mustEmbedUnimplementedClientServiceServer() {}
+func (UnimplementedClientServiceServer) testEmbeddedByValue()                       {}
 
-// UnsafeOrdersServiceServer may be embedded to opt out of forward compatibility for this service.
-// Use of this interface is not recommended, as added methods to OrdersServiceServer will
+// UnsafeClientServiceServer may be embedded to opt out of forward compatibility for this service.
+// Use of this interface is not recommended, as added methods to ClientServiceServer will
 // result in compilation errors.
-type UnsafeOrdersServiceServer interface {
-	mustEmbedUnimplementedOrdersServiceServer()
+type UnsafeClientServiceServer interface {
+	mustEmbedUnimplementedClientServiceServer()
 }
 
-func RegisterOrdersServiceServer(s grpc.ServiceRegistrar, srv OrdersServiceServer) {
-	// If the following call pancis, it indicates UnimplementedOrdersServiceServer was
+func RegisterClientServiceServer(s grpc.ServiceRegistrar, srv ClientServiceServer) {
+	// If the following call pancis, it indicates UnimplementedClientServiceServer was
 	// embedded by pointer and is nil.  This will cause panics if an
 	// unimplemented method is ever invoked, so we test this at initialization
 	// time to prevent it from happening at runtime later due to I/O.
 	if t, ok := srv.(interface{ testEmbeddedByValue() }); ok {
 		t.testEmbeddedByValue()
 	}
-	s.RegisterService(&OrdersService_ServiceDesc, srv)
+	s.RegisterService(&ClientService_ServiceDesc, srv)
 }
 
-func _OrdersService_GetMenu_Handler(srv interface{}, stream grpc.ServerStream) error {
+func _ClientService_GetMenu_Handler(srv interface{}, stream grpc.ServerStream) error {
 	m := new(GetMenuRequest)
 	if err := stream.RecvMsg(m); err != nil {
 		return err
 	}
-	return srv.(OrdersServiceServer).GetMenu(m, &grpc.GenericServerStream[GetMenuRequest, GetMenuResponse]{ServerStream: stream})
+	return srv.(ClientServiceServer).GetMenu(m, &grpc.GenericServerStream[GetMenuRequest, GetMenuResponse]{ServerStream: stream})
 }
 
 // This type alias is provided for backwards compatibility with existing code that references the prior non-generic stream type by name.
-type OrdersService_GetMenuServer = grpc.ServerStreamingServer[GetMenuResponse]
+type ClientService_GetMenuServer = grpc.ServerStreamingServer[GetMenuResponse]
 
-func _OrdersService_CreateOrder_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _ClientService_CreateOrder_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(CreateOrderRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(OrdersServiceServer).CreateOrder(ctx, in)
+		return srv.(ClientServiceServer).CreateOrder(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: OrdersService_CreateOrder_FullMethodName,
+		FullMethod: ClientService_CreateOrder_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(OrdersServiceServer).CreateOrder(ctx, req.(*CreateOrderRequest))
+		return srv.(ClientServiceServer).CreateOrder(ctx, req.(*CreateOrderRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-// OrdersService_ServiceDesc is the grpc.ServiceDesc for OrdersService service.
+func _ClientService_CancelOrder_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CancelOrderRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ClientServiceServer).CancelOrder(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ClientService_CancelOrder_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ClientServiceServer).CancelOrder(ctx, req.(*CancelOrderRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+// ClientService_ServiceDesc is the grpc.ServiceDesc for ClientService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
-var OrdersService_ServiceDesc = grpc.ServiceDesc{
-	ServiceName: "orders_service.OrdersService",
-	HandlerType: (*OrdersServiceServer)(nil),
+var ClientService_ServiceDesc = grpc.ServiceDesc{
+	ServiceName: "orders_service.ClientService",
+	HandlerType: (*ClientServiceServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
 			MethodName: "CreateOrder",
-			Handler:    _OrdersService_CreateOrder_Handler,
+			Handler:    _ClientService_CreateOrder_Handler,
+		},
+		{
+			MethodName: "CancelOrder",
+			Handler:    _ClientService_CancelOrder_Handler,
 		},
 	},
 	Streams: []grpc.StreamDesc{
 		{
 			StreamName:    "GetMenu",
-			Handler:       _OrdersService_GetMenu_Handler,
+			Handler:       _ClientService_GetMenu_Handler,
 			ServerStreams: true,
 		},
 	},

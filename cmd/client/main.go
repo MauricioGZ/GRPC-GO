@@ -23,7 +23,7 @@ func main() {
 
 	defer conn.Close()
 
-	client := pb.NewOrdersServiceClient(conn)
+	client := pb.NewClientServiceClient(conn)
 
 	s := sc.New(client)
 	a := api.New(s)

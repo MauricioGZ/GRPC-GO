@@ -6,16 +6,6 @@ option go_package = "github.com/MauricioGZ/GRPC-GO/proto";
 
 package orders_service;
 
-service OrdersService {
-  rpc GetMenu(GetMenuRequest) returns (stream GetMenuResponse);
-  rpc CreateOrder(CreateOrderRequest) returns (CreateOrderResponse);
-}
-
-service RestaurantService {
-  rpc GetPendingOrders(GetPendingOrdersRequest) returns (stream GetPendingOrdersResponse);
-  rpc SetOrderToReady(SetOrderToReadyRequest) returns (SetOrderToReadyResponse);
-}
-
 message Product {
   uint32 productID = 1;  
   string name = 2;    
@@ -32,6 +22,12 @@ message OrderItemByProductName {
   uint32 quantity = 2;
 }
 
+service ClientService {
+  rpc GetMenu(GetMenuRequest) returns (stream GetMenuResponse);
+  rpc CreateOrder(CreateOrderRequest) returns (CreateOrderResponse);
+  rpc CancelOrder(CancelOrderRequest) returns (CancelOrderResponse);
+}
+
 message GetMenuRequest {}
 
 message GetMenuResponse {
@@ -45,6 +41,17 @@ message CreateOrderRequest {
 
 message CreateOrderResponse {
   uint32 orderID = 1;
+}
+
+message CancelOrderRequest {
+  uint32 orderID = 1;
+}
+
+message CancelOrderResponse {}
+
+service RestaurantService {
+  rpc GetPendingOrders(GetPendingOrdersRequest) returns (stream GetPendingOrdersResponse);
+  rpc SetOrderToReady(SetOrderToReadyRequest) returns (SetOrderToReadyResponse);
 }
 
 message GetPendingOrdersRequest {}

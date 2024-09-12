@@ -32,8 +32,6 @@ func (a *api) GetPendingOrders(w http.ResponseWriter, r *http.Request) {
 
 func (a *api) SetOrderToReady(w http.ResponseWriter, r *http.Request) {
 	orderIDString := r.PathValue("id")
-	ctx, cancel := context.WithTimeout(context.Background(), time.Second*10)
-	defer cancel()
 
 	orderID, err := strconv.ParseUint(orderIDString, 10, 32)
 
@@ -41,6 +39,9 @@ func (a *api) SetOrderToReady(w http.ResponseWriter, r *http.Request) {
 		utils.JSONErrorResponse(w, http.StatusInternalServerError, err)
 		return
 	}
+
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second*10)
+	defer cancel()
 
 	err = a.serv.SetOrderToReady(ctx, uint32(orderID))
 

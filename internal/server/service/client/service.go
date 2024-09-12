@@ -7,7 +7,7 @@ import (
 
 type service struct {
 	repo repository.Repository
-	pb.UnimplementedOrdersServiceServer
+	pb.UnimplementedClientServiceServer
 }
 
 func New(_repo repository.Repository) *service {

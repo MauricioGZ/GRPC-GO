@@ -39,7 +39,7 @@ func main() {
 	}
 
 	grpcServer := grpc.NewServer()
-	pb.RegisterOrdersServiceServer(grpcServer, client_service.New(r))
+	pb.RegisterClientServiceServer(grpcServer, client_service.New(r))
 	pb.RegisterRestaurantServiceServer(grpcServer, restaurant_service.New(r))
 
 	if err := grpcServer.Serve(lis); err != nil {
